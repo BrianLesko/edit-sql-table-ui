@@ -27,19 +27,40 @@ def create_connection(db_name="postgres"):
                 st.rerun()
         return None
 
-# Function to execute query safely
 def run_query(query, cursor):
     try:
-        cursor.execute(query)
-        if query.lower().startswith("select"):
-            # Fetch and return results for SELECT queries
-            return cursor.fetchall()
+        if query.lower().startswith("create database"):
+            # Handle CREATE DATABASE separately
+            cursor.connection.set_isolation_level(0)  # Set autocommit mode
+            cursor.execute(query)
+            cursor.connection.set_isolation_level(1)  # Reset to default mode
+            return "Database created successfully."
         else:
-            # Commit changes for non-SELECT queries (INSERT, UPDATE, DELETE)
-            cursor.connection.commit()
-            return "Query executed successfully."
+            cursor.execute(query)
+            if query.lower().startswith("select"):
+                # Fetch and return results for SELECT queries
+                return cursor.fetchall()
+            else:
+                # Commit changes for non-SELECT queries (INSERT, UPDATE, DELETE)
+                cursor.connection.commit()
+                return "Query executed successfully."
     except (Exception, Error) as error:
         return f"Error: {error}"
+    
+def get_database_list():
+    try:
+        connection = create_connection()
+        if connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT datname FROM pg_database WHERE datistemplate = false;")
+            databases = cursor.fetchall()
+            database_list = [db[0] for db in databases]
+            cursor.close()
+            connection.close()
+            return database_list
+    except (Exception, Error) as error:
+        print(f"Error retrieving database list: {error}")
+        return []
 
 # Function to get list of tables in the database
 def get_sidebar(conn, cursor):
@@ -60,22 +81,32 @@ def get_sidebar(conn, cursor):
 
         st.caption("Databases:")
         for db in user_dbs:
-            if st.button(f"Show tables in {db}"):
-                connection = create_connection(db)
-                if connection:
-                    cursor = connection.cursor()
-                    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name;")
-                    tables = cursor.fetchall()
-                    table_list = [table[0] for table in tables]
-                    for table in table_list:
-                        if st.button(f"Show data in {table}", key=f"{db}_{table}"):  # Ensure unique key for button
-                            st.write(f"Table: {table}")
-                            cursor.execute(f"SELECT * FROM {table};")
-                            data = cursor.fetchall()
-                            for row in data:
-                                st.write(row)
-                    cursor.close()
-                    connection.close()
+            connection = create_connection(db)
+            if connection:
+                cursor = connection.cursor()
+                cursor.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';")
+                table_count = cursor.fetchone()[0]
+                st.write(f"{db}: {table_count} tables")
+                cursor.close()
+                connection.close()
+
+# """
+#             if st.button(f"Show tables in {db}"):
+#                 connection = create_connection(db)
+#                 if connection:
+#                     cursor = connection.cursor()
+#                     cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name;")
+#                     tables = cursor.fetchall()
+#                     table_list = [table[0] for table in tables]
+#                     for table in table_list:
+#                         if st.button(f"Show data in {table}", key=f"{db}_{table}"):  # Ensure unique key for button
+#                             st.write(f"Table: {table}")
+#                             cursor.execute(f"SELECT * FROM {table};")
+#                             data = cursor.fetchall()
+#                             for row in data:
+#                                 st.write(row)
+#                     cursor.close()
+#                     connection.close()"""
 
 
 
@@ -85,7 +116,9 @@ def main():
     st.title("PostgreSQL Query Interface")
 
     # Establish database connection
-    connection = create_connection()
+    all_databases = get_database_list()
+    selected_db = st.selectbox("Select a database:", all_databases)
+    connection = create_connection(selected_db)
     if connection:
         cursor = connection.cursor()
 
