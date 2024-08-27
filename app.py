@@ -1,3 +1,7 @@
+# Brian Lesko
+# 8/27/2024
+# Web App UI for querying a postgresql database running in a container
+
 import streamlit as st
 import psycopg2
 from psycopg2 import Error
@@ -10,8 +14,8 @@ def create_connection(db_name="postgres"):
         connection = psycopg2.connect(
             database=db_name,
             host="127.0.0.1",
-            user="postgres",
-            password="",
+            user="lesko",
+            password="lesko",
             port=5432
         )
         return connection
@@ -87,6 +91,10 @@ def get_sidebar(conn, cursor):
                 cursor.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='public';")
                 table_count = cursor.fetchone()[0]
                 st.write(f"{db}: {table_count} tables")
+                cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public';")
+                tables = cursor.fetchall()
+                for table in tables:
+                    st.write(f" - {table[0]}")
                 cursor.close()
                 connection.close()
 

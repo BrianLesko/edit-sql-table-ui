@@ -8,7 +8,7 @@ Sub goals in the project consist of making sure the data is persistent, that the
 
 Python libraries
 - `streamlit`: to create the user interface with pure python
-- `psycopg2`: to query the SQL database
+- `psycopg2`: to query the SQL database - did not install right
 - `psycopg2-binary`: also needed for querying the database
 
 Docker
