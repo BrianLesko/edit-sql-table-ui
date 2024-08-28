@@ -1,15 +1,14 @@
-# Launch and interact with a SQL database server via a web UI
+# Containerized SQL server with web UI
 
-The main goal of this project is to use PostegreSQL, one of the oldest Structured Query Languages, to implement a data server that can accept queries for retreival and augmentation from the local computer network.
+Written in pure Python and using PostgreSQL, this repository hosts web based UI's. One, for administrative querying of the whole database - app.py. The second, for end users to edit a single table. The current implementation is being deployed in production for an HR department to edit their website access list and PTO days. 
 
-Sub goals in the project consist of making sure the data is persistent, that the database server launches on bootup from a linux computer, and that the project can launch from a pc or mac that has docker desktop running. Of course I also want to learn some PostreSQL queries. 
+The SQL server is containerized, with a docker volume for persistent data. 
 
 ## Dependencies
 
 Python libraries
 - `streamlit`: to create the user interface with pure python
-- `psycopg2`: to query the SQL database - did not install right
-- `psycopg2-binary`: also needed for querying the database
+- `psycopg2-binary`: the binary installed correctly while the normal library did not. 
 
 Docker
 - I am opting for the alpine linux docker cotnainer for a small footprint. 
