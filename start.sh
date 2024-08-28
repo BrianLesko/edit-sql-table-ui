@@ -18,8 +18,8 @@ docker start my_postgres
 # 5. Start the GUI interface
 cd "$(dirname "$(realpath "$0")")"
 source my_env/bin/activate
-streamlit run app.py --server.port 8508 &
+streamlit run app.py --server.port 8508 & # for general queries, setting up your tables etc
 
-streamlit run employees.py --server.port 8509
+streamlit run employees.py --server.port 8509 # Edit your table with a clean UI
 
 # now you can access the server via the terminal with: psql -h 127.0.0.1 -U myuser -d postgres
