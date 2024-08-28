@@ -98,26 +98,6 @@ def get_sidebar(conn, cursor):
                 cursor.close()
                 connection.close()
 
-# """
-#             if st.button(f"Show tables in {db}"):
-#                 connection = create_connection(db)
-#                 if connection:
-#                     cursor = connection.cursor()
-#                     cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name;")
-#                     tables = cursor.fetchall()
-#                     table_list = [table[0] for table in tables]
-#                     for table in table_list:
-#                         if st.button(f"Show data in {table}", key=f"{db}_{table}"):  # Ensure unique key for button
-#                             st.write(f"Table: {table}")
-#                             cursor.execute(f"SELECT * FROM {table};")
-#                             data = cursor.fetchall()
-#                             for row in data:
-#                                 st.write(row)
-#                     cursor.close()
-#                     connection.close()"""
-
-
-
 # Main application function
 def main():
     # Streamlit UI
